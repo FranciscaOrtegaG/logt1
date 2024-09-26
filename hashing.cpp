@@ -10,6 +10,15 @@ const int PAGE_SIZE = 1024;
 
 const int maxElementosPorPagina = PAGE_SIZE/64;
 
+// Funcion de Hashing
+ll h(ll y) {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    std::uniform_int_distribution<ll> dis(0, std::numeric_limits<ll>::max());
+    return dis(gen);
+}
+
+// Estructura page para las paginas
 struct page{
     vector<ll> elementos;
     page* next;
@@ -17,12 +26,6 @@ struct page{
     page(): next(nullptr) {};
 };
 
-ll h(ll y) {
-    std::random_device rd;
-    std::mt19937_64 gen(rd());
-    std::uniform_int_distribution<ll> dis(0, (1LL << 64) - 1);
-    return dis(gen);
-}
 
 // Estructura llave -> valor
 struct Entry {
@@ -56,26 +59,8 @@ std::ostream& operator<<(std::ostream& os, const page& p) {
 class tablaHashing{
 
     private:
-       
-        // Funcion auxiliar para insertar en una pagina
-        void insertarEnPagina(ll idPage, ll valor){
 
-            page* pag = &table[idPage].listPages[0];//desde la primera pagina de la lista
-            while(pag->next != nullptr){
-                pag = pag->next;//hasta la ultima pagina para posicionarnos
-            }
-            if(pag->elementos.size() < maxElementosPorPagina){ //si la ultima página no está llena
-                pag->elementos.push_back(valor);//agregamos el valor
-            }
-            else{
-                page* newPage = new page();
-                newPage->elementos.push_back(valor);
-                pag->next = newPage;
-            }
-            
-        }
-
-        // Funcion auxiliar para buscar en una página
+        // Funcion auxiliar para buscar un valor en una pagina
         bool buscar_en_pagina(page* pag, ll y){
             while (pag != nullptr) { 
                 for (int i = 0; i < pag->elementos.size(); i++) { 
@@ -83,9 +68,44 @@ class tablaHashing{
                         return true;
                     }
                 }
-                pag = pag->next; 
+                if (pag->next == nullptr) {
+                    return false;
+                    break;
+                } else{ 
+                    pag= pag->next;
                 }
-                return false;
+            }
+            return false;
+      }
+       
+        // Funcion auxiliar para insertar en una pagina
+        void insertarEnPagina(ll idPage, ll valor){
+            
+            // Si la pagina esta vacia
+            if (table[idPage].listPages.size() == 0){
+                page newPage;
+                table[idPage].listPages.push_back(newPage);
+            }
+
+
+            page* pag = &table[idPage].listPages[0]; //desde la primera pagina de la lista
+            while (pag != nullptr && pag->next != nullptr){
+                count++;
+                // buscar si el elemento se encuentra en la pagina
+                
+                if (buscar_en_pagina(pag, valor)){
+                    return;
+                }
+                pag = pag->next; //hasta la ultima pagina para posicionarnos
+            }
+            if (pag->elementos.size() < maxElementosPorPagina){ //si la ultima página no está llena
+                pag->elementos.push_back(valor); //agregamos el valor
+            }
+            else{
+                page* newPage = new page();
+                newPage->elementos.push_back(valor);
+                pag->next = newPage;
+            }
         }
 
     public:
@@ -94,28 +114,35 @@ class tablaHashing{
         ll p; // cantidad de paginas
         ll t; // 
         
-        ll count; // Costo promedio
+        ll count; // total de accesos
         ll C_MAX; // Coste promedio maximo (Hiperparametro)
 
         // Constructor
-        tablaHashing(ll accesosPromedio){
+        tablaHashing(ll MAX_ACCESOS){
             ll p = 1;
             ll t = 0;
-            ll count=0; // Costo promedio
-            this->C_MAX = accesosPromedio;
-    
+            ll count=0; // total de accesos
+            this->C_MAX = MAX_ACCESOS;
+            table.resize(p);
         };
         
         // Insertar
         void insert(ll valor) {
             int k = h(valor) % (1 << (t + 1));
-            count++;
-            
-            if (k < p){
+
+            // Insercion
+            if (k < p) {
                 insertarEnPagina(k, valor);
             }
-            else{
+            else {
                 insertarEnPagina(k-(1<<t), valor);
+            }
+
+            // Luego de insertar
+            // Se debe verificar si insercion ha provocado un aumento en el costo promedio de busqueda
+            double costoPromedio = (double) count / p;   // Se calcula el nuevo coste promedio de busqueda
+            if (costoPromedio > C_MAX) {
+                expandir();
             }
         }
         
@@ -131,9 +158,9 @@ class tablaHashing{
             return false;   
         }
 
-        bool necesita_expandir() {
-            return table[p - (1 << t)].listPages[0].elementos.size() > maxElementosPorPagina;
-        }
+        //bool necesita_expandir() {
+          //  return table[p - (1 << t)].listPages[0].elementos.size() > maxElementosPorPagina;
+        //}
 
         void compactar(ll idpage){
             page* currentPage = &table[idpage].listPages[0];
@@ -174,18 +201,29 @@ class tablaHashing{
 
         }
 
-        void print() {
-            cout << "Tabla Hash:\n";
-            for (int i = 0; i < table.size(); i++) {
-                Entry entry = table[i];
-                cout << entry.key << " -> ";
-
-                for (int j = 0; j < entry.listPages.size(); j++) {
+    // Metodo para printear y debuggear de forma profesio
+    void print()
+    {
+        cout << "Tabla Hash:\n";
+        for (int i = 0; i < table.size(); i++)
+        {
+            Entry entry = table[i];
+            cout << entry.key << " -> ";
+            if (entry.listPages.size() == 0)
+            {
+                cout << "[]\n";
+                continue;
+            }
+            else
+            {
+                for (int j = 0; j < entry.listPages.size(); j++)
+                {
                     cout << entry.listPages[j] << "-";
                 }
-                cout << "\n";
             }
+            cout << "\n";
         }
+    }
 };
 
 
@@ -200,9 +238,5 @@ int main() {
     bool b = t.buscar(10);
     cout << b << endl;
     
-
-
-
     return 0;
-
 }
