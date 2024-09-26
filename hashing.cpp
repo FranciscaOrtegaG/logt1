@@ -110,6 +110,7 @@ class tablaHashing{
         void insert(ll valor) {
             int k = h(valor) % (1 << (t + 1));
             count++;
+            
             if (k < p){
                 insertarEnPagina(k, valor);
             }
@@ -190,7 +191,7 @@ class tablaHashing{
 
 int main() {
 
-    tablaHashing t;
+    tablaHashing t(100);
 
     // Insertar
     t.insert(10);
