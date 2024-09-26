@@ -58,12 +58,15 @@ class tablaHashing{
 
         // Buscar en página
         bool buscar_en_pagina(page* pag, ll y){
-            for(int i = 0; i < maxElementosPorPagina; i++){
-                if(pag->elementos[i] == y){
-                    return true;
+            while (pag != nullptr) { 
+                for (int i = 0; i < pag->elementos.size(); i++) { 
+                    if (pag->elementos[i] == y) {
+                        return true;
+                    }
                 }
-            }
-            return false;
+                pag = pag->next; 
+             }
+                return false;
         }
         
         bool buscar(ll y) {
