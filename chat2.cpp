@@ -137,7 +137,7 @@ public:
             t++;
         }
 
-        ll idx = p_anterior - (1LL << t);
+        ll idx = p-1;
         Page* pag_anterior = table[idx].head;
 
         // Mover elementos de la página anterior a la nueva
@@ -182,7 +182,7 @@ public:
 
 void experimento(ll C_MAX, int N)
 {
-    tablaHashing t(C_MAX);
+    TablaHashing t(C_MAX);
 
     // Generar N elementos aleatorios
     random_device rd;
@@ -199,28 +199,7 @@ void experimento(ll C_MAX, int N)
 }
 
 int main() {
-    TablaHashing t(100);
 
-    // Insertar
-    t.insert(10);
-    t.print();
-
-    t.insert(20);
-    t.insert(30);
-    t.insert(40);
-    t.insert(50);
-    t.insert(60);
-    t.insert(70);
-    t.insert(80);
-    t.insert(90);
-    t.insert(100);
-
-    // Imprimir la tabla de hash
-    t.print();
-
-    // Buscar elementos
-    cout << "Buscar 10: " << (t.buscar(10) ? "Encontrado" : "No encontrado") << endl;
-    cout << "Buscar 200: " << (t.buscar(200) ? "Encontrado" : "No encontrado") << endl;
-
-    return 0;
+    experimento(100, 230);
+    
 }
