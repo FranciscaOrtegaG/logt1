@@ -21,6 +21,14 @@ ll h(ll y) {
     return dis(gen);
 }
 
+// Estructura para las métricas del experimento
+struct Metrics {
+    double costo_promedio;
+    double porcentaje_llenado;
+    ll io_count;
+    ll duracion_segundos;
+};
+
 // Estructura para una página
 struct Page {
     vector<ll> elementos;
@@ -65,8 +73,8 @@ private:
         Page* pag = table[idPage].head;
         while (pag != nullptr) {
             count++; // Contar acceso
-            io_count++;
-            if (buscar_en_pagina(pag, valor)) {
+            //io_count++;
+            if (buscar_en_pagina(pag, valor)) { //hace un io count
                 return; // Elemento ya existe
             }
 
@@ -231,7 +239,7 @@ void experimento(ll C_MAX, int N)
     // Imprimir la tabla de hash
     t.print();
 }
-void experimento2(ll C_MAX, ll N)
+Metrics experimento2(ll C_MAX, ll N)
 {
     TablaHashing t(C_MAX);
 
@@ -261,14 +269,21 @@ void experimento2(ll C_MAX, ll N)
     cout << "Porcentaje de llenado de las paginas: " << porcentaje_llenado << "%\n";
     cout << "Número total de I/Os: " << t.get_io_count() << "\n";
 
-    // t.print();
+
+    // Resultados del experimento
+    Metrics metricas;
+    metricas.costo_promedio = t.obtener_costo_promedio();
+    metricas.porcentaje_llenado = t.porcentaje_llenado();
+    metricas.io_count = t.get_io_count();
+
+    return metricas;
 }
 
-void medirDuracionExperimento(void(*experimento)(ll, ll), ll C_MAX, ll N) {
+Metrics medirDuracionExperimento(ll C_MAX, ll N) {
     auto inicio = chrono::high_resolution_clock::now(); // Inicio del cronómetro
 
-    // Ejecutar el experimento
-    experimento(C_MAX, N);
+    // Ejecutar el experimento 2
+    Metrics metricas = experimento2(C_MAX, N);
 
     auto fin = chrono::high_resolution_clock::now(); // Fin del cronómetro
     auto duracion = chrono::duration_cast<seconds>(fin - inicio);  // Duración en segundos
@@ -277,6 +292,8 @@ void medirDuracionExperimento(void(*experimento)(ll, ll), ll C_MAX, ll N) {
     auto segundos = chrono::duration_cast<seconds>(duracion - minutos);
 
     cout << "Tiempo de ejecucion: " << minutos.count() << " minutos y " << segundos.count() << " segundos" << endl;
+    metricas.duracion_segundos = duracion.count();
+    return metricas;
 }
 
 int main() {
@@ -285,22 +302,19 @@ int main() {
     std::ofstream data_tsv;
     string filename = "/experiments_data/data.tsv";
     data_tsv.open(filename);
-    data_tsv << "i\tj\tnumero_experimento\ttiempo_heap\ttiempo_fibonacci\n"; // TSV Header
+    data_tsv << "i\tN\tC_MAX\tcosto_promedio\tporcentaje_llenado\tio_count\tduracion_segundos\n"; // TSV Header
 
     // Medir duración de experimento2
-    for(int i=10;i<25;i++){
+    for(int i=10; i < 25; i++){
+        ll N = 1LL << i;
+        ll C_MAX_values[] = {10, 100, 500, 750, 1024, 2056, 5000, 10000};
         // experimento para 10, 100, 500, 750,1024, 2056, 5000 y 10000
-        medirDuracionExperimento(experimento2, 10, 1LL << i);
-
-        medirDuracionExperimento(experimento2, 100, 1LL << i);        medirDuracionExperimento(experimento2, 2056, 1LL << i);
-        medirDuracionExperimento(experimento2, 5000, 1LL << i);
-        medirDuracionExperimento(experimento2, 10000, 1LL << i);        medirDuracionExperimento(experimento2, 100, 1LL << i);
-        medirDuracionExperimento(experimento2, 500, 1LL << i);
-        medirDuracionExperimento(experimento2, 750, 1LL << i);
-
-        medirDuracionExperimento(experimento2, 1024, 1LL << i);
+        for (ll C_MAX : C_MAX_values) {
+            Metrics metrics = medirDuracionExperimento(C_MAX, N);
+            data_tsv << i << "\t"  << N << "\t" << C_MAX << "\t" << metrics.costo_promedio << "\t" << metrics.porcentaje_llenado << "\t" << metrics.io_count << "\t" << metrics.duracion_segundos << "\n";
+        }
     }
     
-
+    data_tsv.close();
     return 0;
 }
