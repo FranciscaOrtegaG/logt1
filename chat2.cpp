@@ -158,6 +158,24 @@ public:
         compactar(idx);
     }
 
+    double obtener_costo_promedio() const {
+        return static_cast<double>(count) / p;
+    }
+
+    double porcentaje_llenado() const {
+        ll total_elementos = 0;
+        ll total_paginas = 0;
+        for (const Entry& entry : table) {
+            Page* pag = entry.head;
+            while (pag != nullptr) {
+                total_elementos += pag->elementos.size();
+                total_paginas++;
+                pag = pag->next;
+            }
+        }
+        return (total_paginas == 0) ? 0 : (static_cast<double>(total_elementos) / (total_paginas * maxElementosPorPagina)) * 100.0;
+    }
+
     void print() {
         cout << "Tabla Hash:\n";
         for (int i = 0; i < table.size(); i++) {
@@ -197,9 +215,42 @@ void experimento(ll C_MAX, int N)
     // Imprimir la tabla de hash
     t.print();
 }
+void experimento2(ll C_MAX, ll N)
+{
+    TablaHashing t(C_MAX);
+
+    // Generar N elementos aleatorios
+    random_device rd;
+    mt19937_64 gen(rd());
+    uniform_int_distribution<ll> dis(1, numeric_limits<long long>::max());
+
+    // Insertar los N elementos
+    for (ll i = 0; i < N; i++)
+    {
+        ll valor = dis(gen);
+        t.insert(valor);
+
+        // Muestra el progreso
+        if (i % (N / 10) == 0) {
+            cout << "Progreso: " << (i * 100) / N << "%\n";
+        }
+    }
+
+    // Resultados del experimento
+    double costo_promedio = t.obtener_costo_promedio();
+    double porcentaje_llenado = t.porcentaje_llenado();
+
+    cout << "Resultados del experimento con N = " << N << " elementos:\n";
+    cout << "Costo promedio real de insercion: " << costo_promedio << "\n";
+    cout << "Porcentaje de llenado de las paginas: " << porcentaje_llenado << "%\n";
+
+    // Imprimir la tabla final (opcional, solo para depuración)
+    // t.print();
+}
 
 int main() {
 
-    experimento(100, 230);
+    ll N = 1LL << 15;
+    experimento2(1024, N);
     
 }
