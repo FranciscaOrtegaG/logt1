@@ -3,7 +3,10 @@
 #include <random>
 #include <limits>
 #include <chrono>
+#include <fstream> // tsv
+
 using namespace std;
+using namespace std::chrono;
 
 typedef long long ll;
 
@@ -13,7 +16,7 @@ const int maxElementosPorPagina = PAGE_SIZE / sizeof(ll);
 // Función de Hashing aleatorio (no determinista)
 ll h(ll y) {
     std::random_device rd;
-    std::mt19937_64 gen(rd());
+    std::mt19937_64 gen(y);
     std::uniform_int_distribution<ll> dis(0, std::numeric_limits<ll>::max());
     return dis(gen);
 }
@@ -40,8 +43,11 @@ private:
     ll t;               // Parámetro para determinar la expansión
     ll count;           // Total de accesos
     ll C_MAX;           // Costo promedio máximo permitido
+    ll io_count;  // Contador de I/Os
+    
 
     bool buscar_en_pagina(Page* pag, ll y) {
+        io_count++;
         for (const ll& elem : pag->elementos) {
             if (elem == y) {
                 return true;
@@ -53,30 +59,35 @@ private:
     void insertar_en_pagina(ll idPage, ll valor) {
         if (table[idPage].head == nullptr) {
             table[idPage].head = new Page();
+            io_count++;
         }
 
         Page* pag = table[idPage].head;
         while (pag != nullptr) {
             count++; // Contar acceso
+            io_count++;
             if (buscar_en_pagina(pag, valor)) {
                 return; // Elemento ya existe
             }
 
             if (pag->elementos.size() < maxElementosPorPagina) {
                 pag->elementos.push_back(valor);
+                io_count++;
                 return;
             }
 
             // Si la página está llena, ir a la siguiente
             if (pag->next == nullptr) {
                 pag->next = new Page();
+                io_count++;
             }
             pag = pag->next; // Mover a la siguiente página
         }
     }
 
+
 public:
-    TablaHashing(ll MAX_ACCESOS) : p(1), t(0), count(0), C_MAX(MAX_ACCESOS) {
+    TablaHashing(ll MAX_ACCESOS) : p(1), t(0), count(0), C_MAX(MAX_ACCESOS), io_count(0) {
         table.resize(p);
     }
 
@@ -176,6 +187,11 @@ public:
         return (total_paginas == 0) ? 0 : (static_cast<double>(total_elementos) / (total_paginas * maxElementosPorPagina)) * 100.0;
     }
 
+    ll get_io_count() const {
+        return io_count;
+    }
+
+
     void print() {
         cout << "Tabla Hash:\n";
         for (int i = 0; i < table.size(); i++) {
@@ -219,7 +235,7 @@ void experimento2(ll C_MAX, ll N)
 {
     TablaHashing t(C_MAX);
 
-    // Generar N elementos aleatorios
+    // Generar N elementos aleatorios entre 1 y 2^63-1
     random_device rd;
     mt19937_64 gen(rd());
     uniform_int_distribution<ll> dis(1, numeric_limits<long long>::max());
@@ -243,8 +259,8 @@ void experimento2(ll C_MAX, ll N)
     cout << "Resultados del experimento con N = " << N << " elementos:\n";
     cout << "Costo promedio real de insercion: " << costo_promedio << "\n";
     cout << "Porcentaje de llenado de las paginas: " << porcentaje_llenado << "%\n";
+    cout << "Número total de I/Os: " << t.get_io_count() << "\n";
 
-    // Imprimir la tabla final (opcional, solo para depuración)
     // t.print();
 }
 
@@ -255,16 +271,36 @@ void medirDuracionExperimento(void(*experimento)(ll, ll), ll C_MAX, ll N) {
     experimento(C_MAX, N);
 
     auto fin = chrono::high_resolution_clock::now(); // Fin del cronómetro
-    chrono::duration<double> duracion = fin - inicio; // Duración en segundos
+    auto duracion = chrono::duration_cast<seconds>(fin - inicio);  // Duración en segundos
 
-    cout << "Tiempo de ejecución: " << duracion.count() << " segundos" << endl;
+    auto minutos = chrono::duration_cast<minutes>(duracion);
+    auto segundos = chrono::duration_cast<seconds>(duracion - minutos);
+
+    cout << "Tiempo de ejecucion: " << minutos.count() << " minutos y " << segundos.count() << " segundos" << endl;
 }
 
 int main() {
-    ll N = 1LL << 15; // Valor de N
+
+    // Archivo log de creación
+    std::ofstream data_tsv;
+    string filename = "/experiments_data/data.tsv";
+    data_tsv.open(filename);
+    data_tsv << "i\tj\tnumero_experimento\ttiempo_heap\ttiempo_fibonacci\n"; // TSV Header
 
     // Medir duración de experimento2
-    medirDuracionExperimento(experimento2, 1024, N);
+    for(int i=10;i<25;i++){
+        // experimento para 10, 100, 500, 750,1024, 2056, 5000 y 10000
+        medirDuracionExperimento(experimento2, 10, 1LL << i);
+
+        medirDuracionExperimento(experimento2, 100, 1LL << i);        medirDuracionExperimento(experimento2, 2056, 1LL << i);
+        medirDuracionExperimento(experimento2, 5000, 1LL << i);
+        medirDuracionExperimento(experimento2, 10000, 1LL << i);        medirDuracionExperimento(experimento2, 100, 1LL << i);
+        medirDuracionExperimento(experimento2, 500, 1LL << i);
+        medirDuracionExperimento(experimento2, 750, 1LL << i);
+
+        medirDuracionExperimento(experimento2, 1024, 1LL << i);
+    }
+    
 
     return 0;
 }
