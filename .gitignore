@@ -5,3 +5,6 @@ CMakeLists.txt
 .vscode
 .prettierrc
 *.exe
+
+
+*.tsv

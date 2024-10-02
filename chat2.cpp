@@ -4,9 +4,11 @@
 #include <limits>
 #include <chrono>
 #include <fstream> // tsv
+#include <filesystem> // tsv
 
 using namespace std;
 using namespace std::chrono;
+namespace fs = std::filesystem;
 
 typedef long long ll;
 
@@ -299,13 +301,26 @@ Metrics medirDuracionExperimento(ll C_MAX, ll N) {
 int main() {
 
     // Archivo log de creación
-    std::ofstream data_tsv;
-    string filename = "/experiments_data/data.tsv";
+    string filename = "experiments_data/data.tsv";
+    fs::path filepath = filename;
+
+    // Crear el directorio si no existe
+    fs::path dir = filepath.parent_path();
+    if (!fs::exists(dir)) {
+        fs::create_directories(dir);
+    }
+
+    // Abrir el archivo
+    ofstream data_tsv;
     data_tsv.open(filename);
+    if (!data_tsv.is_open()) {
+        cerr << "Error al abrir el archivo " << filename << endl;
+        return 1;
+    }
     data_tsv << "i\tN\tC_MAX\tcosto_promedio\tporcentaje_llenado\tio_count\tduracion_segundos\n"; // TSV Header
 
     // Medir duración de experimento2
-    for(int i=10; i < 25; i++){
+    for(int i=10; i < 15; i++){
         ll N = 1LL << i;
         ll C_MAX_values[] = {10, 100, 500, 750, 1024, 2056, 5000, 10000};
         // experimento para 10, 100, 500, 750,1024, 2056, 5000 y 10000
