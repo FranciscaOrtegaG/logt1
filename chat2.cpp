@@ -2,7 +2,7 @@
 #include <vector>
 #include <random>
 #include <limits>
-
+#include <chrono>
 using namespace std;
 
 typedef long long ll;
@@ -248,9 +248,23 @@ void experimento2(ll C_MAX, ll N)
     // t.print();
 }
 
-int main() {
+void medirDuracionExperimento(void(*experimento)(ll, ll), ll C_MAX, ll N) {
+    auto inicio = chrono::high_resolution_clock::now(); // Inicio del cronómetro
 
-    ll N = 1LL << 15;
-    experimento2(1024, N);
-    
+    // Ejecutar el experimento
+    experimento(C_MAX, N);
+
+    auto fin = chrono::high_resolution_clock::now(); // Fin del cronómetro
+    chrono::duration<double> duracion = fin - inicio; // Duración en segundos
+
+    cout << "Tiempo de ejecución: " << duracion.count() << " segundos" << endl;
+}
+
+int main() {
+    ll N = 1LL << 15; // Valor de N
+
+    // Medir duración de experimento2
+    medirDuracionExperimento(experimento2, 1024, N);
+
+    return 0;
 }
