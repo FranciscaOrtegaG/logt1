@@ -1,6 +1,6 @@
 # Tarea 1 - Hashing Lineal
 
-Esta tarea implementa un Hashing Lineal
+Esta tarea implementa un Hashing Lineal en C++, un método eficiente para manejar grandes conjuntos de datos y gestionar colisiones.
 
 ## Requisitos
 
@@ -30,7 +30,7 @@ ll C_MAX_values[] = {10, 100, 500, 750, 1024, 2056, 5000, 10000};
 for(int i=10; i < 25; i++)
 ```
 
-Si se quisiese cambiar el rango en el cual se generan los valores aleatorios a insertar, se debe modificar la funcion `experimento2`. Que por defecto genera valores aleatorios de 64bits entre $[1,  2^{63}-1]$
+Si se quisiese cambiar el rango en el cual se generan los valores aleatorios a insertar, se debe modificar la funcion `experimento2()`. Que por defecto genera valores aleatorios de 64bits entre $[1,  2^{64}-1]$
 
 ```c++
 uniform_int_distribution<ll> dis(1, numeric_limits<long long>::max());
@@ -62,7 +62,7 @@ Para esta forma de ejecutar, recomendamos seguir la documentación oficial de la
 > [!NOTE]
 > Estos tutoriales, lo que hacen es usar `g++` como compilador de C, y mostrar como ser configurado para VSCode usando la extension. En particular para Windows, se debe instalar `MinGW-w64` para poder tener el compilador de C en Windows (mas información en el tutorial).
 
-La extension de C++, al configurarse como se muestra en el tutorial (seccion _"Run helloworld.cpp"_, punto 2 y 3), se generan varios archivos `.json` para compilar un proyecto. En particular, genera uno llamado `tasks.json`, el cual es quien tiene los parametros que luego son entregado a `g++`
+La extension de C++, al configurarse como se muestra en el tutorial (seccion _"Run helloworld.cpp"_, punto 2 y 3), se generan varios archivos `.json` para compilar un proyecto. En particular, genera uno llamado `tasks.json`, el cual tiene los parametros que luego son entregado a `g++`.
 
 Finalmente se debe ejecutar `main.cpp` usando la extension, lo cual compila y genera un ejecutable `main.exe` que debe ser ejecutado como un programa normal.
 
