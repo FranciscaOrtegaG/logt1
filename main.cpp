@@ -4,7 +4,7 @@
 #include <limits>
 #include <chrono>
 #include <fstream> // tsv
-#include <filesystem> // tsv
+#include <filesystem> // tsv C++17
 
 using namespace std;
 using namespace std::chrono;
@@ -320,7 +320,7 @@ int main() {
     data_tsv << "i\tN\tC_MAX\tcosto_promedio\tporcentaje_llenado\tio_count\tduracion_segundos\n"; // TSV Header
 
     // Medir duración de experimento2
-    for(int i=10; i < 15; i++){
+    for(int i=24; i < 25; i++){
         ll N = 1LL << i;
         ll C_MAX_values[] = {10, 100, 500, 750, 1024, 2056, 5000, 10000};
         // experimento para 10, 100, 500, 750,1024, 2056, 5000 y 10000
