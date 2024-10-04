@@ -6,6 +6,5 @@ CMakeLists.txt
 .prettierrc
 
 *.exe
-
-
 *.tsv
+!experiments_data/data_grupo/*.tsv
