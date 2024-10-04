@@ -1,9 +1,10 @@
 cmake-build-debug
 CMakeLists.txt
 
-
+.idea
 .vscode
 .prettierrc
+
 *.exe
 
 
