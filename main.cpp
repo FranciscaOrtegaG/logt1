@@ -57,7 +57,7 @@ private:
     
 
     bool buscar_en_pagina(Page* pag, ll y) {
-        io_count++;
+        //io_count++;
         for (const ll& elem : pag->elementos) {
             if (elem == y) {
                 return true;
@@ -129,6 +129,7 @@ public:
     }
 
     bool buscar(ll y) {
+        io_count++;
         for (int i = 0; i < p; i++) {
             Page* pag = table[i].head;
             while (pag != nullptr) {
