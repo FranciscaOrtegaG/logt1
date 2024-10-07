@@ -66,15 +66,16 @@ La extension de C++, al configurarse como se muestra en el tutorial (seccion _"R
 
 Finalmente se debe ejecutar `main.cpp` usando la extension, lo cual compila y genera un ejecutable `main.exe` que debe ser ejecutado como un programa normal.
 
-> [!IMPORTANT]
-> Se recalca la importancia de seguir los tutoriales de la extensión de C++ para VSCode debido a que esta fue la forma de ejecución del grupo. Cualquier otro método queda fuera del alcance de lo probado.
-
 ```bash
 $ main.exe
 ```
-
 > [!NOTE]
 > Lo que hace la extension es ejecutar `g++` con la configuración de `tasks.json` de una forma mas automática y mas simple, pero de todas formas se puede ejecutar manualmente. [Aquí están los links de los comandos de g++ (o preguntarle a Mateu 🙂)](https://courses.cs.washington.edu/courses/cse326/00wi/unix/g++.html).
+
+
+> [!IMPORTANT]
+> Se recalca la importancia de seguir los tutoriales de la extensión de C++ para VSCode debido a que esta fue la forma de ejecución del grupo. Cualquier otro método queda fuera del alcance de lo probado.
+
 
 ## Experimentos
 
