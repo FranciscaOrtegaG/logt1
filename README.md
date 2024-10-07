@@ -66,6 +66,9 @@ La extension de C++, al configurarse como se muestra en el tutorial (seccion _"R
 
 Finalmente se debe ejecutar `main.cpp` usando la extension, lo cual compila y genera un ejecutable `main.exe` que debe ser ejecutado como un programa normal.
 
+> [!IMPORTANT]
+> Se recalca la importancia de seguir los tutoriales de la extensión de C++ para VSCode debido a que esta fue la forma de ejecución del grupo. Cualquier otro método queda fuera del alcance de lo probado.
+
 ```bash
 $ main.exe
 ```
